@@ -1,0 +1,24 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.8.5",
+    "heartbeatAt": "2022-05-02T09:15:43.333838",
+    "startedAt": "2022-05-02T09:15:38.008172",
+    "docker": null,
+    "cpu_count": 4,
+    "cuda": null,
+    "args": [
+        "-f",
+        "/Users/zhas/Library/Jupyter/runtime/kernel-ab95db5d-e99f-4ca1-abe9-b0edc6b8ac83.json"
+    ],
+    "state": "running",
+    "program": "EDA.ipynb",
+    "root": "/Users/zhas/Desktop/MLOps/udacity-mlops/nd0821-c2-build-model-workflow-starter",
+    "git": {
+        "remote": "https://github.com/shaikhzhas/nd0821-c2-build-model-workflow-starter.git",
+        "commit": "52782165e3ec16615d2ade3e0f5273687e13426d"
+    },
+    "email": "zhas@globus.ai",
+    "host": "Zhassulans-MacBook-Pro.local",
+    "username": "zhas",
+    "executable": "/Library/Frameworks/Python.framework/Versions/3.8/bin/python3.8"
+}

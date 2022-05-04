@@ -1,0 +1,34 @@
+{
+    "os": "macOS-10.16-x86_64-i386-64bit",
+    "python": "3.8.5",
+    "heartbeatAt": "2022-05-02T10:03:33.054576",
+    "startedAt": "2022-05-02T10:03:28.102200",
+    "docker": null,
+    "cpu_count": 4,
+    "cuda": null,
+    "args": [
+        ".",
+        "-vv",
+        "--csv",
+        "clean_sample.csv:latest",
+        "--ref",
+        "clean_sample.csv:reference",
+        "--kl_threshold",
+        "0.2",
+        "--min_price",
+        "10",
+        "--max_price",
+        "350"
+    ],
+    "state": "running",
+    "program": "/Library/Frameworks/Python.framework/Versions/3.8/bin/pytest",
+    "git": {
+        "remote": "https://github.com/shaikhzhas/nd0821-c2-build-model-workflow-starter.git",
+        "commit": "52782165e3ec16615d2ade3e0f5273687e13426d"
+    },
+    "email": "zhas@globus.ai",
+    "root": "/Users/zhas/Desktop/MLOps/udacity-mlops/nd0821-c2-build-model-workflow-starter",
+    "host": "Zhassulans-MacBook-Pro.local",
+    "username": "zhas",
+    "executable": "/Library/Frameworks/Python.framework/Versions/3.8/bin/python3.8"
+}
