@@ -14,33 +14,26 @@ logger = logging.getLogger()
 
 def go(args):
 
-    run = wandb.init(job_type="basic_cleaning")
+    run = wandb.init(job_type="data_cleaning")
     run.config.update(args)
 
-    # Download input artifact. This will also log that this script is using this
-    # particular version of the artifact
-    # artifact_local_path = run.use_artifact(args.input_artifact).file()
-
-    ######################
-    # YOUR CODE HERE     #
-    ######################
     logger.info("Downloading artifact")
-    artifact = run.use_artifact(args.input_artifact)
-    artifact_path = artifact.file()
-    df = pd.read_csv(artifact_path)
+    artifact_local_path = run.use_artifact(args.input_artifact).file()
+    df = pd.read_csv(artifact_local_path)
+    # cleaning column names from spaces
+    df.columns = [col.strip() for col in df.columns]
+    # dropping duplicated rows
+    df = df.drop_duplicates()
+    # preprocessing categorical columns
+    categorical_columns = [
+        'relationship','workclass','marital-status','occupation','race','sex','native-country','salary'
+    ]
+    for col in categorical_columns:
+        df[col] = df[col].str.strip().str.capitalize()
+    # encoding salary category as boolean variables for modeling
+    df['salary'] = df['salary'].apply(lambda x: x=='>50k')
 
-    # Drop outliers
-    idx = df['price'].between(args.min_price, args.max_price)
-    df = df[idx].copy()
-
-    # Convert last_review to datetime
-    df['last_review'] = pd.to_datetime(df['last_review'])
-
-    # Check the proper area
-    idx = df['longitude'].between(-74.25, -73.50) & df['latitude'].between(40.5, 41.2)
-    df = df[idx].copy()
-
-    filename = "clean_sample.csv"
+    filename = "../../data/clean_census.csv"
     df.to_csv(filename,index=False)
 
     artifact = wandb.Artifact(
@@ -62,37 +55,23 @@ if __name__ == "__main__":
         description="This steps cleans the data",
         fromfile_prefix_chars="@",
     )
-
     parser.add_argument(
         "--input_artifact",
         type=str,
         help="Fully-qualified name for the input artifact",
         required=True,
     )
-
     parser.add_argument(
         "--output_artifact", type=str, help="Name for the output artifact", required=True
     )
-
     parser.add_argument(
         "--output_type", type=str, help="Type for the output artifact", required=True
     )
-
     parser.add_argument(
         "--output_description",
         type=str,
         help="Description for the output artifact",
         required=True,
     )
-
-    parser.add_argument(
-        "--min_price", type=float, help="Minimum price", required=True
-    )
-
-    parser.add_argument(
-        "--max_price", type=float, help="Maximum price", required=True
-    )
-
     args = parser.parse_args()
-
     go(args)

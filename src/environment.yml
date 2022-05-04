@@ -1,4 +1,4 @@
-name: nyc_airbnb_dev
+name: census_salary
 channels:
   - conda-forge
   - defaults

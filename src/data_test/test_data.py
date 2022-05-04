@@ -4,40 +4,38 @@ import scipy.stats
 
 
 def test_column_names(data):
-
     expected_colums = [
-        "id",
-        "name",
-        "host_id",
-        "host_name",
-        "neighbourhood_group",
-        "neighbourhood",
-        "latitude",
-        "longitude",
-        "room_type",
-        "price",
-        "minimum_nights",
-        "number_of_reviews",
-        "last_review",
-        "reviews_per_month",
-        "calculated_host_listings_count",
-        "availability_365",
+        'age',
+        'workclass',
+        'fnlgt',
+        'education',
+        'education-num',
+        'marital-status',
+        'occupation',
+        'relationship',
+        'race',
+        'sex',
+        'capital-gain',
+        'capital-loss',
+        'hours-per-week',
+        'native-country',
+        'salary'
     ]
-
     these_columns = data.columns.values
-
     # This also enforces the same order
     assert list(expected_colums) == list(these_columns)
 
-
-def test_neighborhood_names(data):
-
-    known_names = ["Bronx", "Brooklyn", "Manhattan", "Queens", "Staten Island"]
-
-    neigh = set(data['neighbourhood_group'].unique())
-
+def test_sex_names(data):
+    known_names = ["Male","Female"]
+    sex_names = set(data['sex'].unique())
     # Unordered check
-    assert set(known_names) == set(neigh)
+    assert set(known_names) == set(sex_names)
+
+def test_sex_names(data):
+    known_names = ["Male","Female"]
+    sex_names = set(data['sex'].unique())
+    # Unordered check
+    assert set(known_names) == set(sex_names)
 
 
 def test_proper_boundaries(data: pd.DataFrame):
