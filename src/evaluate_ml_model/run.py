@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 This step takes the best model, tagged with the "prod" tag, and tests it against the test dataset
 """
@@ -9,7 +8,6 @@ import mlflow
 import pandas as pd
 import itertools
 from sklearn.metrics import roc_auc_score
-from wandb_utils.log_artifact import log_artifact
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger()
@@ -31,13 +29,14 @@ def go(args):
     X_test = pd.read_csv(test_dataset_path)
     y_test = X_test.pop("salary")
 
+    # Loading inference pipeline
     logger.info("Loading model and performing inference on test set")
     sk_pipe = mlflow.sklearn.load_model(model_local_path)
     used_columns = list(itertools.chain.from_iterable([x[2] for x in sk_pipe['preprocessor'].transformers]))
 
     logger.info("Scoring test dataset")
     y_pred = sk_pipe.predict(X_test[used_columns])
-    auc_score = roc_auc_score(y_test, y_pred, average="weighted")
+    auc_score = roc_auc_score(y_test, y_pred, average = "weighted")
     logger.info(f"Score: {auc_score}")
     run.summary['auc'] = auc_score
 
@@ -52,14 +51,11 @@ if __name__ == "__main__":
         help="Input ML model",
         required=True
     )
-
     parser.add_argument(
         "--test_dataset",
         type=str, 
         help="Test dataset",
         required=True
     )
-
     args = parser.parse_args()
-
     go(args)

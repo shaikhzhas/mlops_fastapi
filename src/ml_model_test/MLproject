@@ -1,0 +1,11 @@
+name: ml_model_test
+conda_env: conda.yml
+
+entry_points:
+  main:
+    parameters:
+
+      rf_config:
+        description: config for random forest model
+
+    command: "pytest . -vv --rf_config {rf_config}"
