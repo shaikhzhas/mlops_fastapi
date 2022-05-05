@@ -1,12 +1,12 @@
-name: download_file
+name: data_register
 conda_env: conda.yml
 
 entry_points:
   main:
     parameters:
 
-      sample:
-        description: Name of sample to download
+      file_name:
+        description: Name of file
         type: string
 
       artifact_name:
@@ -22,4 +22,4 @@ entry_points:
         description: A brief description of the output artifact
         type: string
 
-    command: "python run.py {sample} {artifact_name} {artifact_type} {artifact_description}"
+    command: "python run.py {file_name} {artifact_name} {artifact_type} {artifact_description}"

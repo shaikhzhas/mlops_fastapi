@@ -1,0 +1,14 @@
+name: evaluate_ml_model
+conda_env: conda.yml
+
+entry_points:
+  main:
+    parameters:
+      ml_model:
+        description: An MLflow serialized model
+        type: string
+      test_dataset:
+        description: The test artifact
+        type: string
+
+    command: "python run.py  --ml_model {ml_model} --test_dataset {test_dataset}"

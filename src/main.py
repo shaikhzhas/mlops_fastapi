@@ -9,10 +9,10 @@ _steps = [
     "data_register",
     "data_cleaning",
     "data_test",
-    "ml_test",
     "data_split",
-    "train_random_forest",
-    "evaluate_model"
+    "train_ml_model",
+    "ml_model_test",
+    "evaluate_ml_model"
 ]
 
 
@@ -65,16 +65,48 @@ def go(config: DictConfig):
                 "main",
                 parameters={
                     "csv": "clean_census.csv:latest",
-                    "ref": "clean_census.csv:reference",
+                    "ref": "clean_census.csv:latest",
                     "kl_threshold": config["data_test"]["kl_threshold"],
                     "min_age": config['etl']['min_age'],
                     "max_age": config['etl']['max_age']
                 },
             )
-        
-        if "ml_test" in active_steps:
+
+        if "data_split" in active_steps:
             _ = mlflow.run(
-                os.path.join(root_path, "src", "ml_test"),
+                os.path.join(root_path, "src", "data_split"),
+                "main",
+                parameters={
+                    "input": "clean_census.csv:latest",
+                    "test_size": config["modeling"]["test_size"],
+                    "random_seed": config["modeling"]["random_seed"],
+                    "stratify_by": config["modeling"]["stratify_by"]
+                },
+            )
+
+        if "train_ml_model" in active_steps:
+
+            # NOTE: we need to serialize the random forest configuration into JSON
+            rf_config = os.path.abspath("rf_config.json")
+            with open(rf_config, "w+") as fp:
+                json.dump(dict(config["modeling"]["random_forest"].items()), fp)
+
+            _ = mlflow.run(
+                os.path.join(root_path, "src", "train_ml_model"),
+                "main",
+                parameters={
+                    "trainval_artifact": "trainval_data.csv:latest",
+                    "val_size" : config["modeling"]["val_size"],
+                    "random_seed": config["modeling"]["random_seed"],
+                    "stratify_by": config["modeling"]["stratify_by"],
+                    "rf_config": rf_config,
+                    "output_artifact": "random_forest_export"
+                },
+            )
+        
+        if "ml_model_test" in active_steps:
+            _ = mlflow.run(
+                os.path.join(root_path, "src", "ml_model_test"),
                 "main",
                 parameters={
                     "csv": "clean_sample.csv:latest",
@@ -85,45 +117,12 @@ def go(config: DictConfig):
                 },
             )
 
-        if "data_split" in active_steps:
+        if "evaluate_ml_model" in active_steps:
             _ = mlflow.run(
-                os.path.join(root_path, "src", "train_val_test_split"),
+                os.path.join(root_path, "src", "evaluate_ml_model"),
                 "main",
                 parameters={
-                    "input": "clean_sample.csv:latest",
-                    "test_size": config["modeling"]["test_size"],
-                    "random_seed": config["modeling"]["random_seed"],
-                    "stratify_by": config["modeling"]["stratify_by"]
-                },
-            )
-
-        if "train_random_forest" in active_steps:
-
-            # NOTE: we need to serialize the random forest configuration into JSON
-            rf_config = os.path.abspath("rf_config.json")
-            with open(rf_config, "w+") as fp:
-                json.dump(dict(config["modeling"]["random_forest"].items()), fp)
-
-            _ = mlflow.run(
-                os.path.join(root_path, "src", "train_random_forest"),
-                "main",
-                parameters={
-                    "trainval_artifact": "trainval_data.csv:latest",
-                    "val_size" : config["modeling"]["val_size"],
-                    "random_seed": config["modeling"]["random_seed"],
-                    "stratify_by": config["modeling"]["stratify_by"],
-                    "rf_config": rf_config,
-                    "max_tfidf_features" : config["modeling"]["max_tfidf_features"],
-                    "output_artifact": "random_forest_export"
-                },
-            )
-
-        if "evaluate_model" in active_steps:
-            _ = mlflow.run(
-                os.path.join(hydra.utils.get_original_cwd(), "src", "evaluate_model"),
-                "main",
-                parameters={
-                    "mlflow_model": "random_forest_export:prod",
+                    "mlflow_model": "random_forest_export:latest",
                     "test_dataset": "test_data.csv:latest"
                 },
             )

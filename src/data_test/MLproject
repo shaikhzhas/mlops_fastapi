@@ -1,4 +1,4 @@
-name: data_check
+name: data_test
 conda_env: conda.yml
 
 entry_points:
@@ -17,12 +17,12 @@ entry_points:
         description: Threshold for the KL divergence test on the neighborhood group column
         type: float
 
-      min_price:
-        description: Minimum accepted price
-        type: float
+      min_age:
+        description: Minimum accepted age
+        type: integer
 
-      max_price:
-        description: Maximum accepted price
-        type: float
+      max_age:
+        description: Maximum accepted age
+        type: integer
 
-    command: "pytest . -vv --csv {csv} --ref {ref} --kl_threshold {kl_threshold} --min_price {min_price} --max_price {max_price}"
+    command: "pytest . -vv --csv {csv} --ref {ref} --kl_threshold {kl_threshold} --min_price {min_age} --max_price {max_age}"

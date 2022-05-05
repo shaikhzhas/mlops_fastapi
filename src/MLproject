@@ -1,4 +1,4 @@
-name: nyc_airbnb
+name: census_salary
 conda_env: conda.yml
 
 entry_points:

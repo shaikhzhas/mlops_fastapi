@@ -26,7 +26,8 @@ def go(args):
     df = df.drop_duplicates()
     # preprocessing categorical columns
     categorical_columns = [
-        'relationship','workclass','marital-status','occupation','race','sex','native-country','salary'
+        'education','relationship','workclass','marital-status',
+        'occupation','race','sex','native-country','salary'
     ]
     for col in categorical_columns:
         df[col] = df[col].str.strip().str.capitalize()
