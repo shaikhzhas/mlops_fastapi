@@ -1,14 +1,13 @@
-#!/usr/bin/env python
 """
 This script splits the provided dataframe in test and remainder
 """
 import argparse
 import logging
 import pandas as pd
+import os
 import wandb
 import tempfile
 from sklearn.model_selection import train_test_split
-from wandb_utils.log_artifact import log_artifact
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger()
@@ -39,13 +38,14 @@ def go(args):
         logger.info(f"Uploading {k}_data.csv dataset")
         with tempfile.NamedTemporaryFile("w") as fp:
             df.to_csv(fp.name, index=False)
-            log_artifact(
+            artifact = wandb.Artifact(
                 f"{k}_data.csv",
-                f"{k}_data",
-                f"{k} split of dataset",
-                fp.name,
-                run,
+                type=f"{k}_data",
+                description=f"{k} split of dataset",
             )
+            artifact.add_file(fp.name)
+            run.log_artifact(artifact)
+            artifact.wait()
 
 
 if __name__ == "__main__":

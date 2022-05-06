@@ -25,4 +25,4 @@ entry_points:
         description: Maximum accepted age
         type: integer
 
-    command: "pytest . -vv --csv {csv} --ref {ref} --kl_threshold {kl_threshold} --min_price {min_age} --max_price {max_age}"
+    command: "pytest . -vv --csv {csv} --ref {ref} --kl_threshold {kl_threshold} --min_age {min_age} --max_age {max_age}"

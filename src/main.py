@@ -31,13 +31,18 @@ def go(config: DictConfig):
     steps_par = config['main']['steps']
     active_steps = steps_par.split(",") if steps_par != "all" else _steps
 
+    # we need to serialize the random forest configuration into JSON
+    rf_config = os.path.abspath("rf_config.json")
+    with open(rf_config, "w+") as fp:
+        json.dump(dict(config["modeling"]["random_forest"].items()), fp)
+
     # Move to a temporary directory
     with tempfile.TemporaryDirectory() as tmp_dir:
 
         if "data_register" in active_steps:
             # Download file and load in W&B
             _ = mlflow.run(
-                os.path.join(root_path, "src", "data_register"),
+                os.path.join(root_path, "data_register"),
                 "main",
                 parameters={
                     "file_name": config["etl"]["file_name"],
@@ -49,7 +54,7 @@ def go(config: DictConfig):
 
         if "data_cleaning" in active_steps:
             _ = mlflow.run(
-                os.path.join(root_path, "src", "data_cleaning"),
+                os.path.join(root_path, "data_cleaning"),
                 "main",
                 parameters={
                     "input_artifact": "census.csv:latest",
@@ -61,7 +66,7 @@ def go(config: DictConfig):
 
         if "data_test" in active_steps:
             _ = mlflow.run(
-                os.path.join(root_path, "src", "data_test"),
+                os.path.join(root_path, "data_test"),
                 "main",
                 parameters={
                     "csv": "clean_census.csv:latest",
@@ -74,7 +79,7 @@ def go(config: DictConfig):
 
         if "data_split" in active_steps:
             _ = mlflow.run(
-                os.path.join(root_path, "src", "data_split"),
+                os.path.join(root_path, "data_split"),
                 "main",
                 parameters={
                     "input": "clean_census.csv:latest",
@@ -86,13 +91,8 @@ def go(config: DictConfig):
 
         if "train_ml_model" in active_steps:
 
-            # NOTE: we need to serialize the random forest configuration into JSON
-            rf_config = os.path.abspath("rf_config.json")
-            with open(rf_config, "w+") as fp:
-                json.dump(dict(config["modeling"]["random_forest"].items()), fp)
-
             _ = mlflow.run(
-                os.path.join(root_path, "src", "train_ml_model"),
+                os.path.join(root_path, "train_ml_model"),
                 "main",
                 parameters={
                     "trainval_artifact": "trainval_data.csv:latest",
@@ -106,7 +106,7 @@ def go(config: DictConfig):
         
         if "ml_model_test" in active_steps:
             _ = mlflow.run(
-                os.path.join(root_path, "src", "ml_model_test"),
+                os.path.join(root_path, "ml_model_test"),
                 "main",
                 parameters={
                     "rf_config": rf_config,
@@ -115,10 +115,10 @@ def go(config: DictConfig):
 
         if "evaluate_ml_model" in active_steps:
             _ = mlflow.run(
-                os.path.join(root_path, "src", "evaluate_ml_model"),
+                os.path.join(root_path, "evaluate_ml_model"),
                 "main",
                 parameters={
-                    "mlflow_model": "random_forest_export:latest",
+                    "ml_model": "random_forest_export:latest",
                     "test_dataset": "test_data.csv:latest"
                 },
             )

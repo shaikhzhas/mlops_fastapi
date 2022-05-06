@@ -1,57 +1,32 @@
 import pytest
 import numpy as np
-
+import json
+import pandas as pd
 
 def pytest_addoption(parser):
     parser.addoption("--rf_config", action="store")
 
 @pytest.fixture(scope='session')
 def dummy_feats_and_labels():
-    feats = np.array(
-        [
-            [
-                26, 257910, 0, 0, 60, 'Private', 'Some-college', 'United-states',
-                10, 'Never-married', 'Other-service', 'Not-in-family', 'White','Male'
-            ],
-            [
-                58, 183893, 0, 0, 40, 'Private', 'Some-college', 'United-states',
-                10, 'Divorced', 'Adm-clerical', 'Unmarried', 'Black', 'Female'
-            ],
-            [
-                45, 271962, 0, 0, 40, 'State-gov', 'Bachelors', 'United-states',
-                13, 'Divorced', 'Protective-serv', 'Not-in-family', 'White','Female'
-            ],
-            [
-                54, 96062, 0, 0, 40, 'Private', 'Assoc-acdm', 'United-states',
-                12, 'Married-civ-spouse', 'Tech-support', 'Husband', 'White', 'Male'
-            ],
-            [
-                24, 124971, 0, 0, 38, 'Private', 'Hs-grad', 'United-states',
-                9,'Never-married', 'Sales', 'Not-in-family', 'White', 'Male'
-            ],
-            [
-                21, 176486, 0, 0, 60, 'Private', 'Hs-grad', 'United-states',
-                9, 'Married-spouse-absent', 'Exec-managerial', 'Other-relative','White', 'Female'
-            ],
-            [
-                34, 312197, 0, 0, 75, 'Self-emp-not-inc', 'Hs-grad', 'Mexico',
-                9, 'Married-civ-spouse', 'Transport-moving', 'Husband', 'White', 'Male'
-            ],
-            [
-                44, 171722, 0, 0, 39, 'Private', 'Hs-grad', 'United-states', 
-                9, 'Separated', 'Other-service', 'Unmarried', 'White', 'Female'
-            ],
-            [
-                41, 47902, 0, 0, 45, 'Local-gov', 'Bachelors', 'United-states',
-                13, 'Married-civ-spouse', 'Prof-specialty', 'Husband', 'White', 'Male'
-            ],
-            [
-                54, 377701, 0, 0, 32, 'Private', 'Hs-grad', 'Mexico',
-                9, 'Married-civ-spouse', 'Other-service', 'Husband', 'White', 'Male'
-            ]
-        ]
+    feats = pd.DataFrame(
+        {
+            'age': [26, 58, 45, 54, 24, 21, 34, 44, 41],
+            'fnlgt' : [257910, 183893, 271962, 96062, 124971, 176486, 312197, 171722, 47902],
+            'capital-gain': [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            'capital-loss': [0, 0, 0, 0, 0, 0, 0, 0, 0],
+            'hours-per-week' : [60, 40, 40, 40, 38, 60, 75, 39, 45],
+            'workclass' : ['Private', 'Private', 'State-gov', 'Private', 'Private', 'Private', 'Self-emp-not-inc', 'Private', 'Local-gov'],
+            'education' : ['Some-college', 'Some-college', 'Bachelors', 'Assoc-acdm', 'Hs-grad', 'Hs-grad', 'Hs-grad', 'Hs-grad', 'Bachelors'],
+            'native-country': ['United-states', 'United-states', 'United-states', 'United-states', 'United-states', 'United-states', 'Mexico', 'United-states', 'United-states'],
+            'education-num' : [10, 10, 13, 12, 9, 9, 9, 9, 13],
+            'marital-status': ['Never-married', 'Divorced', 'Divorced', 'Married-civ-spouse', 'Never-married', 'Married-spouse-absent', 'Married-civ-spouse', 'Separated', 'Married-civ-spouse'],
+            'occupation' : ['Other-service', 'Adm-clerical', 'Protective-serv', 'Tech-support', 'Sales', 'Exec-managerial', 'Transport-moving', 'Other-service', 'Prof-specialty'],
+            'relationship' : ['Not-in-family', 'Unmarried', 'Not-in-family', 'Husband', 'Not-in-family', 'Other-relative', 'Husband', 'Unmarried', 'Husband'],
+            'race' : ['White', 'Black', 'White', 'White', 'White', 'White', 'White', 'White', 'White'],
+            'sex':  ['Male', 'Female', 'Female', 'Male', 'Male', 'Female', 'Male', 'Female', 'Male']
+        }
     )
-    labels = np.array([False, False, False,  True, False, False,  True, False,  True, False])
+    labels = np.array([False, False, False,  True, False, False,  True, False,  True])
     return feats, labels
 
 @pytest.fixture(scope='session')
@@ -59,4 +34,6 @@ def rf_config(request):
     rf_config = request.config.option.rf_config
     if rf_config is None:
         pytest.fail("You must provide a rf config")
-    return dict(rf_config)
+    with open(rf_config) as fp:
+        rf_config = json.load(fp)
+    return rf_config

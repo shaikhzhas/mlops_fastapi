@@ -47,8 +47,6 @@ def go(args):
     logger.info("Logging artifact")
     run.log_artifact(artifact)
 
-    os.remove(filename)
-
 
 if __name__ == "__main__":
 

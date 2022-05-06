@@ -1,0 +1,25 @@
+flavors:
+  python_function:
+    env: conda.yaml
+    loader_module: mlflow.sklearn
+    model_path: model.pkl
+    python_version: 3.8.13
+  sklearn:
+    pickled_model: model.pkl
+    serialization_format: cloudpickle
+    sklearn_version: 0.24.1
+saved_input_example_info:
+  artifact_path: input_example.json
+  pandas_orient: split
+  type: dataframe
+signature:
+  inputs: '[{"name": "age", "type": "long"}, {"name": "fnlgt", "type": "long"}, {"name":
+    "capital-gain", "type": "long"}, {"name": "capital-loss", "type": "long"}, {"name":
+    "hours-per-week", "type": "long"}, {"name": "workclass", "type": "string"}, {"name":
+    "education", "type": "string"}, {"name": "native-country", "type": "string"},
+    {"name": "education-num", "type": "long"}, {"name": "marital-status", "type":
+    "string"}, {"name": "occupation", "type": "string"}, {"name": "relationship",
+    "type": "string"}, {"name": "race", "type": "string"}, {"name": "sex", "type":
+    "string"}]'
+  outputs: '[{"type": "tensor", "tensor-spec": {"dtype": "bool", "shape": [-1]}}]'
+utc_time_created: '2022-05-06 05:07:22.308009'

@@ -4,23 +4,24 @@ This script trains a Random Forest
 import argparse
 import logging
 import mlflow
+import shutil
 from mlflow.models import infer_signature
 import json
 import wandb
 import pandas as pd
-import numpy as np
-import itertools
-from sklearn.compose import ColumnTransformer
-from sklearn.ensemble import RandomForestClassifier
+import importlib.util
+import os
+import glob
 from sklearn.metrics import roc_auc_score, plot_confusion_matrix
 from sklearn.model_selection import train_test_split
-from sklearn.preprocessing import StandardScaler, OneHotEncoder
-from sklearn.pipeline import Pipeline, make_pipeline
-from sklearn.impute import SimpleImputer
 import matplotlib.pyplot as plt
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
 logger = logging.getLogger()
+
+spec = importlib.util.spec_from_file_location("common", os.path.abspath(__file__ + "/../../") + '/common/ml_pipeline.py')
+ml_pipeline = importlib.util.module_from_spec(spec)
+spec.loader.exec_module(ml_pipeline)
 
 def go(args):
 
@@ -43,7 +44,7 @@ def go(args):
     )
 
     logger.info("Preparing sklearn pipeline")
-    sk_pipe, used_columns = get_inference_pipeline(rf_config)
+    sk_pipe, used_columns = ml_pipeline.get_inference_pipeline(rf_config)
     # Then fit it to the X_train, y_train data
     logger.info("Fitting")
     sk_pipe.fit(X_train[used_columns], y_train)
@@ -56,6 +57,8 @@ def go(args):
 
     logger.info("Exporting model")
     model_path = '../model'
+    if os.path.exists(model_path):
+        shutil.rmtree(model_path)
     signature = infer_signature(X_val[used_columns], y_pred)
     mlflow.sklearn.save_model(
         sk_pipe,
@@ -76,7 +79,7 @@ def go(args):
     # log auc score in W&B
     run.summary['auc'] = auc_score
     # Plot feature importance
-    fig_feat_imp = plot_feature_importance(sk_pipe, used_columns)
+    fig_feat_imp = ml_pipeline.plot_feature_importance(sk_pipe, used_columns)
     # Plot confusion matrix 
     fig_cm, sub_cm = plt.subplots(figsize=(10, 10))
     plot_confusion_matrix(
@@ -94,64 +97,7 @@ def go(args):
             "confusion_matrix": wandb.Image(fig_cm),
         }
     )
-
-def plot_feature_importance(pipe, feat_names):
-    feat_names = np.array(
-        pipe["preprocessor"].transformers[0][-1]
-        + pipe["preprocessor"].transformers[1][-1]
-    )
-    feat_imp = pipe["classifier"].feature_importances_[: len(feat_names)]
-    fig_feat_imp, sub_feat_imp = plt.subplots(figsize=(10, 10))
-    idx = np.argsort(feat_imp)[::-1]
-    sub_feat_imp.bar(range(feat_imp.shape[0]), feat_imp[idx], color="r", align="center")
-    _ = sub_feat_imp.set_xticks(range(feat_imp.shape[0]))
-    _ = sub_feat_imp.set_xticklabels(feat_names[idx], rotation=90)
-    fig_feat_imp.tight_layout()
-    return fig_feat_imp
-
-def get_inference_pipeline(rf_config):
-    categorical = [
-        "workclass",
-        "education",
-        "native-country",
-        "education-num",
-        "marital-status",
-        'occupation', 
-        'relationship',
-        'race',
-        'sex'
-    ]
-    categorical_preproc = make_pipeline(
-        SimpleImputer(strategy="most_frequent"),
-        OneHotEncoder(handle_unknown='ignore')
-    )
-    numeric_features = [
-        'age',
-        'fnlgt',
-        'capital-gain',
-        'capital-loss',
-        'hours-per-week'
-    ]
-    numeric_transformer = make_pipeline(
-        SimpleImputer(strategy="median"),
-        StandardScaler()
-    )
-    preprocessor = ColumnTransformer(
-        transformers = [
-                ("num", numeric_transformer, numeric_features),
-                ("cat", categorical_preproc, categorical)
-            ],
-        remainder="drop",  # This drops the columns that we do not transform
-    ) 
-    used_columns = list(itertools.chain.from_iterable([x[2] for x in preprocessor.transformers]))
-    sk_pipe = Pipeline(
-        steps=[
-            ("preprocessor", preprocessor),
-            ("classifier", RandomForestClassifier(**rf_config)),
-        ]
-    )
-    return sk_pipe, used_columns
-
+    shutil.copy2('../model/model.pkl', '../../model/model.pkl') 
 
 if __name__ == "__main__":
 
