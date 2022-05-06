@@ -12,3 +12,4 @@ mlflow
 matplotlib
 pillow
 pylint
+flake8

@@ -65,8 +65,7 @@ def plot_feature_importance(pipe, feat_names):
     plotting feature importance
     """
     feat_names = np.array(
-        pipe["preprocessor"].transformers[0][-1]
-        + pipe["preprocessor"].transformers[1][-1]
+        pipe["preprocessor"].transformers[0][-1] + pipe["preprocessor"].transformers[1][-1]
     )
     feat_imp = pipe["classifier"].feature_importances_[: len(feat_names)]
     fig_feat_imp, sub_feat_imp = plt.subplots(figsize=(10, 10))

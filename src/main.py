@@ -37,7 +37,7 @@ def go(config: DictConfig):
         json.dump(dict(config["modeling"]["random_forest"].items()), fp)
 
     # Move to a temporary directory
-    with tempfile.TemporaryDirectory() as tmp_dir:
+    with tempfile.TemporaryDirectory() as _:
 
         if "data_register" in active_steps:
             # Download file and load in W&B
@@ -96,14 +96,14 @@ def go(config: DictConfig):
                 "main",
                 parameters={
                     "trainval_artifact": "trainval_data.csv:latest",
-                    "val_size" : config["modeling"]["val_size"],
+                    "val_size": config["modeling"]["val_size"],
                     "random_seed": config["modeling"]["random_seed"],
                     "stratify_by": config["modeling"]["stratify_by"],
                     "rf_config": rf_config,
                     "output_artifact": "random_forest_export"
                 },
             )
-        
+
         if "ml_model_test" in active_steps:
             _ = mlflow.run(
                 os.path.join(root_path, "ml_model_test"),
