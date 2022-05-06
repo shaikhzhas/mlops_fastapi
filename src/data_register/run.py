@@ -1,4 +1,3 @@
-#!/usr/bin/env python
 """
 This script download a URL to a local destination
 """
@@ -8,13 +7,16 @@ import os
 import wandb
 
 logging.basicConfig(level=logging.INFO, format="%(asctime)-15s %(message)s")
-logger = logging.getLogger()
+LOGGER = logging.getLogger()
 
 
-def go(args):
+def run_step(args):
+    """
+    run data register step
+    """
     run = wandb.init(job_type="data_register")
     run.config.update(args)
-    logger.info(f"Uploading {args.artifact_name} to Weights & Biases")
+    LOGGER.info(f"Uploading {args.artifact_name} to Weights & Biases")
     # Log to W&B
     artifact = wandb.Artifact(
         args.artifact_name,
@@ -27,12 +29,20 @@ def go(args):
 
 
 if __name__ == "__main__":
-    parser = argparse.ArgumentParser(description="Download URL to a local destination")
-    parser.add_argument("file_name", type=str, help="File name to upload")
-    parser.add_argument("artifact_name", type=str, help="Name for the output artifact")
-    parser.add_argument("artifact_type", type=str, help="Output artifact type.")
-    parser.add_argument(
-        "artifact_description", type=str, help="A brief description of this artifact"
-    )
-    args = parser.parse_args()
-    go(args)
+    PARSER = argparse.ArgumentParser(
+        description="Download URL to a local destination")
+    PARSER.add_argument("file_name", type=str, help="File name to upload")
+    PARSER.add_argument(
+        "artifact_name",
+        type=str,
+        help="Name for the output artifact")
+    PARSER.add_argument(
+        "artifact_type",
+        type=str,
+        help="Output artifact type.")
+    PARSER.add_argument(
+        "artifact_description",
+        type=str,
+        help="A brief description of this artifact")
+    ARGUMENTS = PARSER.parse_args()
+    run_step(ARGUMENTS)
