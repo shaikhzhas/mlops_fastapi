@@ -12,4 +12,4 @@ wandb==0.10.21
 mlflow
 matplotlib
 pillow
-pyliny
+pylint
