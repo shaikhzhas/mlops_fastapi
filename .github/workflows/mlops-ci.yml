@@ -3,7 +3,7 @@ name: MLOps-CI
 on:
   push:
     paths:
-      - "**.py"
+      - "*.py"
 
 jobs:
   build:
