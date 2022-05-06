@@ -2,10 +2,6 @@ name: MLOps-CI
 
 on:
   push:
-    paths:
-      - "*.py"
-      - "*.yml"
-      - "*.txt"
 
 jobs:
   build:
