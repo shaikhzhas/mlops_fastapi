@@ -8,3 +8,8 @@ fastapi==0.63.0
 uvicorn
 gunicorn
 autopep8
+wandb==0.10.21
+mlflow
+matplotlib
+pillow
+pyliny
