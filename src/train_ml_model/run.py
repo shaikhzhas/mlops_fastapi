@@ -1,5 +1,5 @@
 """
-This script trains a Random Forest
+This script trains a Random Forest model
 """
 import argparse
 import logging
